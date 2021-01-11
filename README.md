@@ -444,7 +444,7 @@ FROM bitnami/suitecrm
 ## Put your customizations below
 ...
 ```
-
+## Example 1
 Here is an example of extending the image with the following modifications:
 
 - Install the `vim` editor
@@ -484,6 +484,21 @@ Based on the extended image, you can update the [`docker-compose.yml`](https://g
      environment:
 +      - PHP_MEMORY_LIMIT=512m
      ...
+```
+## Example 2: Add SuiteCRM API support
+```Dockerfile
+FROM bitnami/suitecrm
+LABEL maintainer "Bitnami <containers@bitnami.com>"
+
+## Install keys
+USER 0 # Required to perform privileged actions
+RUN openssl genrsa -out /opt/bitnami/suitecrm/Api/V8/OAuth2/private.key 2048 && \
+openssl rsa -in /opt/bitnami/suitecrm/Api/V8/OAuth2/private.key -pubout -out /opt/bitnami/suitecrm/Api/V8/OAuth2/public.key && \
+chmod 600 /opt/bitnami/suitecrm/Api/V8/OAuth2/private.key /opt/bitnami/suitecrm/Api/V8/OAuth2/public.key && \
+chown daemon:daemon /opt/bitnami/suitecrm/Api/V8/OAuth2/p*.key && \
+sed -i "s/AllowOverride None/AllowOverride All/g" /opt/bitnami/apache2/conf/vhosts/suitecrm-vhost.conf && \
+sed -i "s/AllowOverride None/AllowOverride All/g" /opt/bitnami/apache2/conf/vhosts/suitecrm-https-vhost.conf &&
+USER 1001 # Revert to the original non-root user
 ```
 
 ## Notable Changes
