@@ -491,14 +491,12 @@ FROM bitnami/suitecrm
 LABEL maintainer "Bitnami <containers@bitnami.com>"
 
 ## Install keys
-USER 0 # Required to perform privileged actions
 RUN openssl genrsa -out /opt/bitnami/suitecrm/Api/V8/OAuth2/private.key 2048 && \
 openssl rsa -in /opt/bitnami/suitecrm/Api/V8/OAuth2/private.key -pubout -out /opt/bitnami/suitecrm/Api/V8/OAuth2/public.key && \
-chmod 600 /opt/bitnami/suitecrm/Api/V8/OAuth2/private.key /opt/bitnami/suitecrm/Api/V8/OAuth2/public.key && \
-chown daemon:daemon /opt/bitnami/suitecrm/Api/V8/OAuth2/p*.key && \
-sed -i "s/AllowOverride None/AllowOverride All/g" /opt/bitnami/apache2/conf/vhosts/suitecrm-vhost.conf && \
-sed -i "s/AllowOverride None/AllowOverride All/g" /opt/bitnami/apache2/conf/vhosts/suitecrm-https-vhost.conf &&
-USER 1001 # Revert to the original non-root user
+chmod 600 /opt/bitnami/suitecrm/Api/V8/OAuth2/private.key /opt/bitnami/suitecrm/Api/V8/OAuth2/public.key
+USER 0 # Required to perform privileged actions
+RUN sed -i "s/AllowOverride None/AllowOverride mod_rewrite/g" /opt/bitnami/apache2/conf/vhosts/suitecrm-vhost.conf && \
+sed -i "s/AllowOverride None/AllowOverride mod_rewrite/g" /opt/bitnami/apache2/conf/vhosts/suitecrm-https-vhost.conf &&
 ```
 
 ## Notable Changes
